@@ -686,12 +686,11 @@ void sysexCallback(byte command, byte argc, byte *argv)
       break;
     case NERVES_OLED_WRITE:
       {
-        Serial1.println("Write text display");
-        char message[argc-1];
-        for (byte i=0; i<argc; i++) {
-          message[i] = argv[i];
-        }
-        Serial1.println(message);
+        // NULL terminate the message just in case it isn't
+        char message[argc + 1];
+        memcpy(message, argv, argc);
+        message[argc] = 0;
+
         SeeedOled.clearDisplay();          //clear the screen and set start position to top left corner
         SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
         SeeedOled.setPageMode();           //Set addressing mode to Page Mode
