@@ -1,5 +1,5 @@
 /*
- * SeeedOLED.cpp
+ * TickerOLED.cpp
  * SSD130x OLED Driver Library
  *
  * Copyright (c) 2011 seeed technology inc.
@@ -23,7 +23,7 @@
  */
 
 #include "Wire.h"
-#include "SeeedOLED.h"
+#include "TickerOLED.h"
 
 #include <avr/pgmspace.h>
 
@@ -314,84 +314,84 @@ const uint8_t TickerFont_data[] PROGMEM = {
     0, 0};
 
 
-void SeeedOLED::init(void)
+void TickerOLED::init()
 {
-    sendCommand(SeeedOLED_Display_Off_Cmd);     //display off
+    sendCommand(TickerOLED_Display_Off_Cmd);     //display off
     delay(5); 
-    sendCommand(SeeedOLED_Display_On_Cmd);  //display on
+    sendCommand(TickerOLED_Display_On_Cmd);  //display on
     delay(5); 
-    sendCommand(SeeedOLED_Normal_Display_Cmd);  //Set Normal Display (default)
+    sendCommand(TickerOLED_Normal_Display_Cmd);  //Set Normal Display (default)
 
     // Set Horizontal addressing
     sendCommand(0x20);          //set addressing mode
     sendCommand(0x00);          //set horizontal addressing mode
 }
 
-void SeeedOLED::sendCommand(unsigned char command)
+void TickerOLED::sendCommand(unsigned char command)
 {
-  Wire.beginTransmission(SeeedOLED_Address); // begin I2C communication
+  Wire.beginTransmission(TickerOLED_Address); // begin I2C communication
 #if defined(ARDUINO) && ARDUINO >= 100
-  Wire.write(SeeedOLED_Command_Mode);        // Set OLED Command mode
+  Wire.write(TickerOLED_Command_Mode);        // Set OLED Command mode
   Wire.write(command);
 #else
-  Wire.send(SeeedOLED_Command_Mode);         // Set OLED Command mode
+  Wire.send(TickerOLED_Command_Mode);         // Set OLED Command mode
   Wire.send(command);
 #endif
   Wire.endTransmission();                // End I2C communication
 }
 
-void SeeedOLED::setBrightness(unsigned char Brightness)
+void TickerOLED::setBrightness(unsigned char Brightness)
 {
-   sendCommand(SeeedOLED_Set_Brightness_Cmd);
+   sendCommand(TickerOLED_Set_Brightness_Cmd);
    sendCommand(Brightness);
 }
 
-void SeeedOLED::setTextXY(unsigned char Row, unsigned char Column)
+void TickerOLED::setTextXY(unsigned char Row, unsigned char Column)
 {
     sendCommand(0xB0 + Row);            //set page address
     sendCommand(0x00 + (8*Column & 0x0F));  //set column lower address
     sendCommand(0x10 + ((8*Column>>4)&0x0F));   //set column higher address
 }
 
-void SeeedOLED::clearDisplay()
+void TickerOLED::clearDisplay()
 {
-  sendCommand(SeeedOLED_Display_Off_Cmd);   //display off
+  sendCommand(TickerOLED_Display_Off_Cmd);   //display off
   setTextXY(0, 0);
 
   uint16_t bytes = 128 * 64 / 8;
   do
   {
-      Wire.beginTransmission(SeeedOLED_Address); // begin I2C transmission
-      Wire.write(SeeedOLED_Data_Mode);            // data mode
+      Wire.beginTransmission(TickerOLED_Address); // begin I2C transmission
+      Wire.write(TickerOLED_Data_Mode);            // data mode
       int chunkSize = min(bytes, MAX_DATA_CHUNK);
       for (int j = 0; j < chunkSize; j++)
           Wire.write(0);
       Wire.endTransmission();                    // stop I2C transmission
       bytes -= chunkSize;
   } while (bytes > 0);
-  sendCommand(SeeedOLED_Display_On_Cmd);    //display on
+  sendCommand(TickerOLED_Display_On_Cmd);    //display on
   setTextXY(0,0); // Should be unnecessary
 }
 
-void SeeedOLED::sendData(unsigned char Data)
+void TickerOLED::sendData(unsigned char Data)
 {
-     Wire.beginTransmission(SeeedOLED_Address); // begin I2C transmission
+     Wire.beginTransmission(TickerOLED_Address); // begin I2C transmission
 #if defined(ARDUINO) && ARDUINO >= 100
-     Wire.write(SeeedOLED_Data_Mode);            // data mode
+     Wire.write(TickerOLED_Data_Mode);            // data mode
      Wire.write(Data);
 #else
-     Wire.send(SeeedOLED_Data_Mode);            // data mode
+     Wire.send(TickerOLED_Data_Mode);            // data mode
      Wire.send(Data);
 #endif
      Wire.endTransmission();                    // stop I2C transmission
 }
 
-void SeeedOLED::drawBitmapFast(unsigned char *bitmaparray,int bytes)
+void TickerOLED::drawBitmap(const unsigned char *bitmaparray, int bytes)
 {
   do
   {
-      Wire.beginTransmission(SeeedOLED_Address); // begin I2C transmission
-      Wire.write(SeeedOLED_Data_Mode);            // data mode
+      Wire.beginTransmission(TickerOLED_Address); // begin I2C transmission
+      Wire.write(TickerOLED_Data_Mode);            // data mode
       int chunkSize = min(bytes, MAX_DATA_CHUNK);
       for (int j = 0; j < chunkSize; j++)
       {
@@ -414,7 +414,7 @@ static uint8_t tickerBuffer[TICKER_PAGES][TICKER_COLUMNS];
 static uint16_t tickerColumn = 0;
 static uint16_t tickerMaxColumn = 0;
 
-void SeeedOLED::setTicker(const char *message)
+void TickerOLED::setTicker(const char *message)
 {
     memset(tickerBuffer, 0, sizeof(tickerBuffer));
     uint16_t column = 0;
@@ -448,11 +448,9 @@ void SeeedOLED::setTicker(const char *message)
         tickerMaxColumn = 128;
     else if (tickerMaxColumn > TICKER_COLUMNS)
         tickerMaxColumn = TICKER_COLUMNS;
-
-    tickerMaxColumn = TICKER_COLUMNS-1;
 }
 
-void SeeedOLED::updateTicker()
+void TickerOLED::updateTicker()
 {
     // Go back to the origin
     sendCommand(0xB0);
@@ -466,8 +464,8 @@ void SeeedOLED::updateTicker()
     uint8_t widthWritten = 0;
     do
     {
-        Wire.beginTransmission(SeeedOLED_Address); // begin I2C transmission
-        Wire.write(SeeedOLED_Data_Mode);            // data mode
+        Wire.beginTransmission(TickerOLED_Address); // begin I2C transmission
+        Wire.write(TickerOLED_Data_Mode);            // data mode
         int chunkSize = min(bytes, MAX_DATA_CHUNK);
         for (uint16_t j = 0; j < chunkSize; j++)
         {
@@ -491,16 +489,12 @@ void SeeedOLED::updateTicker()
         tickerColumn = 0;
 }
 
-void SeeedOLED::setNormalDisplay()
+void TickerOLED::setNormalDisplay()
 {
-    sendCommand(SeeedOLED_Normal_Display_Cmd);
+    sendCommand(TickerOLED_Normal_Display_Cmd);
 }
 
-void SeeedOLED::setInverseDisplay()
+void TickerOLED::setInverseDisplay()
 {
-    sendCommand(SeeedOLED_Inverse_Display_Cmd);
+    sendCommand(TickerOLED_Inverse_Display_Cmd);
 }
-
-
-SeeedOLED SeeedOled;  // Preinstantiate Objects
-

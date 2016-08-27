@@ -1,20 +1,26 @@
 #ifndef NERVES_H
 #define NERVES_H
 
-// SeeedOLED Instruction set addresses
-
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include <WProgram.h>
-#include "Wire.h"
-#endif
-
 #include <avr/pgmspace.h>
 
 #define NERVES_OLED_CLEAR 0x80
 #define NERVES_OLED_LOGO  0x81
 #define NERVES_OLED_WRITE 0x82
+
+static const unsigned char NervesSmall[40 * 5] PROGMEM = {
+    0, 0, 0, 0, 0, 0, 0, 56, 124, 254, 254, 254, 252, 184, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 240, 248,
+    252, 252, 252, 252, 248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 1, 3, 15, 63, 252, 240, 192, 128, 0, 0, 0, 128, 192, 224,
+    224, 112, 56, 30, 15, 7, 3, 3, 1, 1, 1, 1, 0, 0, 0, 0,
+    0, 28, 62, 63, 63, 62, 28, 24, 24, 24, 24, 24, 24, 216, 248, 255,
+    255, 127, 255, 255, 255, 255, 27, 25, 24, 24, 56, 56, 56, 56, 56, 56,
+    120, 252, 252, 254, 252, 252, 120, 0, 0, 0, 128, 192, 192, 192, 224, 224,
+    240, 56, 28, 14, 7, 7, 3, 1, 0, 0, 0, 3, 15, 63, 252, 240,
+    128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 15, 31, 63, 63, 31, 31, 15, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 28, 63, 127, 126, 62, 28, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0};
 
 static const unsigned char NervesLogo [] PROGMEM = {
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,

@@ -28,7 +28,7 @@
 #include <Firmata.h>
 
 #include "nerves.h"
-#include "SeeedOLED.h"
+#include "TickerOLED.h"
 
 #define I2C_WRITE                   B00000000
 #define I2C_READ                    B00001000
@@ -665,24 +665,24 @@ void sysexCallback(byte command, byte argc, byte *argv)
       break;
     case NERVES_OLED_CLEAR:
       {
-        SeeedOled.setNormalDisplay();
-        SeeedOled.clearDisplay();
+        TickerOLED::setNormalDisplay();
+        TickerOLED::clearDisplay();
       }
       break;
     case NERVES_OLED_LOGO:
       {
-        SeeedOled.setInverseDisplay();
-        SeeedOled.clearDisplay();
-        SeeedOled.drawBitmapFast((unsigned char*)NervesLogo, 1024);   // 1024 = 128 Pixels * 64 Pixels / 8
+        TickerOLED::setInverseDisplay();
+        TickerOLED::clearDisplay();
+        TickerOLED::drawBitmap(NervesLogo, sizeof(NervesLogo));   // 1024 = 128 Pixels * 64 Pixels / 8
       }
       break;
     case NERVES_OLED_WRITE:
       {
         // NULL terminate the message just in case it isn't
-        SeeedOled.clearDisplay();          //clear the screen and set start position to top left corner
-        SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
-        SeeedOled.setTextXY(0,0);          //Set the cursor to Xth Page, Yth Column
-        // UPDATE ME SeeedOled.putString(argv, argc); //Print the String
+        TickerOLED::clearDisplay();          //clear the screen and set start position to top left corner
+        TickerOLED::setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
+        TickerOLED::drawBitmap(NervesSmall, sizeof(NervesSmall));
+        // UPDATE ME TickerOLED.putString(argv, argc); //Print the String
       }
       break;
   }
@@ -787,21 +787,20 @@ void setup()
   // Firmata.begin(Serial1);
 
   Wire.begin();
-  SeeedOled.init();  //initialze SEEED OLED display
+  TickerOLED::init();  //initialze SEEED OLED display
 #if 1
-  SeeedOled.setInverseDisplay();          // Set Display to inverse mode
-  SeeedOled.clearDisplay();               // clear the screen and set start position to top left corner
-  //SeeedOled.deactivateScroll();
-  SeeedOled.drawBitmapFast((unsigned char*)NervesLogo,1024);   // 1024 = 128 Pixels * 64 Pixels / 8
+  TickerOLED::setInverseDisplay();          // Set Display to inverse mode
+  TickerOLED::clearDisplay();               // clear the screen and set start position to top left corner
+  TickerOLED::drawBitmap(NervesLogo, sizeof(NervesLogo));   // 1024 = 128 Pixels * 64 Pixels / 8
 #endif
    delay(500);
 
 #if 1
-        SeeedOled.clearDisplay();          //clear the screen and set start position to top left corner
-        SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
+        TickerOLED::clearDisplay();          //clear the screen and set start position to top left corner
+        TickerOLED::setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
         
-static const char message[] PROGMEM = "abcdefghifghijklmnopqrstuvwxyz01234567890";
-        SeeedOled.setTicker(message);
+static const char message[] PROGMEM = "Loading...";
+        TickerOLED::setTicker(message);
 #endif
 
   // Connecting from LinkIt
@@ -812,7 +811,7 @@ static const char message[] PROGMEM = "abcdefghifghijklmnopqrstuvwxyz01234567890
   Firmata.begin(57600);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for ATmega32u4-based boards and Arduino 101
-      SeeedOled.updateTicker();
+      TickerOLED::updateTicker();
   }
 
   systemResetCallback();  // reset to default config
@@ -860,5 +859,5 @@ void loop()
   serialFeature.update();
 #endif
 
-  SeeedOled.updateTicker();
+  TickerOLED::updateTicker();
 }
