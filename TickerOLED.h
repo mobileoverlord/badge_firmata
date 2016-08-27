@@ -56,9 +56,6 @@ public:
 
 static void init();
 
-static void setNormalDisplay();
-static void setInverseDisplay();
-
 static void sendCommand(unsigned char command);
 static void sendData(unsigned char Data);
 
@@ -67,7 +64,7 @@ static void clearDisplay();
 static void setBrightness(unsigned char Brightness);
 static void drawBitmap(const unsigned char *bitmaparray,int bytes);
 
-static void setTicker(const char *message);
+static void setTicker(const char *message, uint16_t len);
 static void updateTicker();
 
 };

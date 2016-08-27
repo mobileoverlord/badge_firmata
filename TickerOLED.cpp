@@ -412,12 +412,20 @@ static uint8_t tickerBuffer[TICKER_PAGES][TICKER_COLUMNS];
 static uint16_t tickerColumn = 0;
 static uint16_t tickerMaxColumn = 0;
 
-void TickerOLED::setTicker(const char *message)
+void TickerOLED::setTicker(const char *message, uint16_t len)
 {
     memset(tickerBuffer, 0, sizeof(tickerBuffer));
+
+    // Handle off case
+    if (len == 0) {
+        tickerColumn = 0;
+        tickerMaxColumn = 0;
+        return;
+    }
+
     uint16_t column = 0;
-    for (;;) {
-        char c = pgm_read_byte(message);
+    for (uint16_t i = 0; i < len; i++) {
+        char c = message[i]; // pgm_read_byte(&message[i]);
         if (c == 0)
             break;
         if (c < 32 || c >= 127)
@@ -437,7 +445,6 @@ void TickerOLED::setTicker(const char *message)
             offset += width;
         }
         column += width;
-        message++;
     }
 
     tickerColumn = 0;
@@ -450,6 +457,9 @@ void TickerOLED::setTicker(const char *message)
 
 void TickerOLED::updateTicker()
 {
+    if (tickerMaxColumn == 0)
+        return;
+
     // Go back to the origin
     sendCommand(0xB0);
     sendCommand(0x00);
@@ -485,14 +495,4 @@ void TickerOLED::updateTicker()
     tickerColumn++;
     if (tickerColumn >= tickerMaxColumn)
         tickerColumn = 0;
-}
-
-void TickerOLED::setNormalDisplay()
-{
-    sendCommand(TickerOLED_Normal_Display_Cmd);
-}
-
-void TickerOLED::setInverseDisplay()
-{
-    sendCommand(TickerOLED_Inverse_Display_Cmd);
 }
