@@ -355,7 +355,6 @@ void TickerOLED::setTextXY(unsigned char Row, unsigned char Column)
 
 void TickerOLED::clearDisplay()
 {
-  sendCommand(TickerOLED_Display_Off_Cmd);   //display off
   setTextXY(0, 0);
 
   uint16_t bytes = 128 * 64 / 8;
@@ -369,7 +368,6 @@ void TickerOLED::clearDisplay()
       Wire.endTransmission();                    // stop I2C transmission
       bytes -= chunkSize;
   } while (bytes > 0);
-  sendCommand(TickerOLED_Display_On_Cmd);    //display on
   setTextXY(0,0); // Should be unnecessary
 }
 

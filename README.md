@@ -13,4 +13,10 @@
   8. Load `badge_firmata.ino` into the Arduino IDE
   9. Run Sketch->Upload
 
+# Creating the images
 
+convert ~/nerves/nerves-icon.png -resize 128x40 -threshold 95% -gravity center -extent 128x40 -negate nerves-small.png
+~/experiments/png2oled/png2oled nerves-small.png
+
+convert ~/nerves/nerves-icon.png -resize 128x64 -threshold 95% -gravity center -extent 128x64 -negate nerves-big.png
+~/experiments/png2oled/png2oled nerves-big.png

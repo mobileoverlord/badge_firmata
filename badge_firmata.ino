@@ -665,13 +665,11 @@ void sysexCallback(byte command, byte argc, byte *argv)
       break;
     case NERVES_OLED_CLEAR:
       {
-        TickerOLED::setNormalDisplay();
         TickerOLED::clearDisplay();
       }
       break;
     case NERVES_OLED_LOGO:
       {
-        TickerOLED::setInverseDisplay();
         TickerOLED::clearDisplay();
         TickerOLED::drawBitmap(NervesLogo, sizeof(NervesLogo));   // 1024 = 128 Pixels * 64 Pixels / 8
       }
@@ -680,7 +678,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
       {
         // NULL terminate the message just in case it isn't
         TickerOLED::clearDisplay();          //clear the screen and set start position to top left corner
-        TickerOLED::setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
+        TickerOLED::setTextXY(3, 0);
         TickerOLED::drawBitmap(NervesSmall, sizeof(NervesSmall));
         // UPDATE ME TickerOLED.putString(argv, argc); //Print the String
       }
@@ -789,7 +787,6 @@ void setup()
   Wire.begin();
   TickerOLED::init();  //initialze SEEED OLED display
 #if 1
-  TickerOLED::setInverseDisplay();          // Set Display to inverse mode
   TickerOLED::clearDisplay();               // clear the screen and set start position to top left corner
   TickerOLED::drawBitmap(NervesLogo, sizeof(NervesLogo));   // 1024 = 128 Pixels * 64 Pixels / 8
 #endif
@@ -797,8 +794,9 @@ void setup()
 
 #if 1
         TickerOLED::clearDisplay();          //clear the screen and set start position to top left corner
-        TickerOLED::setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
-        
+        TickerOLED::setTextXY(3, 0);
+        TickerOLED::drawBitmap(NervesSmall, sizeof(NervesSmall));
+
 static const char message[] PROGMEM = "Loading...";
         TickerOLED::setTicker(message);
 #endif
