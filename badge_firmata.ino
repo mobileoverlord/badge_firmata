@@ -28,7 +28,8 @@
 #include <Firmata.h>
 
 #include "nerves.h"
-#include <SeeedOLED.h>
+#include "OLED_Display_128X64/SeeedOLED.h"
+#include "OLED_Display_128X64/SeeedOLED.cpp"
 
 #define I2C_WRITE                   B00000000
 #define I2C_READ                    B00001000
@@ -111,14 +112,6 @@ byte wireRead(void)
 #else
   return Wire.receive();
 #endif
-}
-
-void clearDisplay()
-{
-  SeeedOled.deactivateScroll();
-  SeeedOled.setHorizontalMode();
-  SeeedOled.setNormalDisplay();          // Set Display to inverse mode
-  SeeedOled.clearDisplay();               // clear the screen and set start position to top left corner
 }
 
 /*==============================================================================
@@ -674,14 +667,14 @@ void sysexCallback(byte command, byte argc, byte *argv)
     case NERVES_OLED_CLEAR:
       {
         SeeedOled.setNormalDisplay();
-        clearDisplay();
+        SeeedOled.clearDisplay();
       }
       break;
     case NERVES_OLED_LOGO:
       {
         SeeedOled.setInverseDisplay();
-        clearDisplay();
-        SeeedOled.drawBitmap((unsigned char*)NervesLogo,1024);   // 1024 = 128 Pixels * 64 Pixels / 8
+        SeeedOled.clearDisplay();
+        SeeedOled.drawBitmapFast((unsigned char*)NervesLogo, 1024);   // 1024 = 128 Pixels * 64 Pixels / 8
       }
       break;
     case NERVES_OLED_WRITE:
@@ -693,11 +686,8 @@ void sysexCallback(byte command, byte argc, byte *argv)
 
         SeeedOled.clearDisplay();          //clear the screen and set start position to top left corner
         SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
-        SeeedOled.setPageMode();           //Set addressing mode to Page Mode
-        SeeedOled.setTextXY(22,0);          //Set the cursor to Xth Page, Yth Column
-        SeeedOled.putString(message); //Print the String
-        SeeedOled.setHorizontalScrollProperties(Scroll_Left,0,64,Scroll_5Frames);
-        SeeedOled.activateScroll();
+        SeeedOled.setTextXY(0,0);          //Set the cursor to Xth Page, Yth Column
+        // UPDATE ME SeeedOled.putString(message); //Print the String
       }
       break;
   }
@@ -803,10 +793,26 @@ void setup()
 
   Wire.begin();
   SeeedOled.init();  //initialze SEEED OLED display
+#if 1
   SeeedOled.setInverseDisplay();          // Set Display to inverse mode
   SeeedOled.clearDisplay();               // clear the screen and set start position to top left corner
-  SeeedOled.deactivateScroll();
-  SeeedOled.drawBitmap((unsigned char*)NervesLogo,1024);   // 1024 = 128 Pixels * 64 Pixels / 8
+  //SeeedOled.deactivateScroll();
+  SeeedOled.drawBitmapFast((unsigned char*)NervesLogo,1024);   // 1024 = 128 Pixels * 64 Pixels / 8
+#endif
+   delay(500);
+
+#if 0
+        SeeedOled.clearDisplay();          //clear the screen and set start position to top left corner
+        SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
+        
+static const char message[] PROGMEM = "abcdefghifghijklmnopqrstuvwxyz01234567890";
+        SeeedOled.setTicker(message);
+
+        for (;;) {
+          SeeedOled.updateTicker();
+          //delay(500);
+        }
+#endif
 
   // Connecting from LinkIt
   // Serial1.begin(57600);
