@@ -671,15 +671,13 @@ void sysexCallback(byte command, byte argc, byte *argv)
       break;
     case NERVES_OLED_LOGO:
       {
-        TickerOLED::clearDisplay();
+        TickerOLED::setTextXY(0, 0);
         TickerOLED::drawBitmap(NervesLogo, sizeof(NervesLogo));   // 1024 = 128 Pixels * 64 Pixels / 8
         TickerOLED::setTicker(0, 0);
       }
       break;
     case NERVES_OLED_WRITE:
       {
-        // NULL terminate the message just in case it isn't
-        TickerOLED::clearDisplay();          //clear the screen and set start position to top left corner
         TickerOLED::setTextXY(3, 0);
         TickerOLED::drawBitmap(NervesSmall, sizeof(NervesSmall));
         TickerOLED::setTicker((const char *) argv, argc); //Print the String
@@ -789,16 +787,15 @@ void setup()
   Wire.begin();
   TickerOLED::init();  //initialze SEEED OLED display
 #if 0
-  TickerOLED::clearDisplay();               // clear the screen and set start position to top left corner
+  TickerOLED::setTextXY(0, 0);
   TickerOLED::drawBitmap(NervesLogo, sizeof(NervesLogo));   // 1024 = 128 Pixels * 64 Pixels / 8
 #endif
 #if 1
-        TickerOLED::clearDisplay();          //clear the screen and set start position to top left corner
-        TickerOLED::setTextXY(3, 0);
-        TickerOLED::drawBitmap(NervesSmall, sizeof(NervesSmall));
+  TickerOLED::setTextXY(3, 0);
+  TickerOLED::drawBitmap(NervesSmall, sizeof(NervesSmall));
 
 static const char message[] = "Loading...";
-        TickerOLED::setTicker(message, sizeof(message));
+  TickerOLED::setTicker(message, sizeof(message));
 #endif
 
   // Connecting from LinkIt
