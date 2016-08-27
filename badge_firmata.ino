@@ -28,8 +28,7 @@
 #include <Firmata.h>
 
 #include "nerves.h"
-#include "OLED_Display_128X64/SeeedOLED.h"
-#include "OLED_Display_128X64/SeeedOLED.cpp"
+#include "SeeedOLED.h"
 
 #define I2C_WRITE                   B00000000
 #define I2C_READ                    B00001000
@@ -680,14 +679,10 @@ void sysexCallback(byte command, byte argc, byte *argv)
     case NERVES_OLED_WRITE:
       {
         // NULL terminate the message just in case it isn't
-        char message[argc + 1];
-        memcpy(message, argv, argc);
-        message[argc] = 0;
-
         SeeedOled.clearDisplay();          //clear the screen and set start position to top left corner
         SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
         SeeedOled.setTextXY(0,0);          //Set the cursor to Xth Page, Yth Column
-        // UPDATE ME SeeedOled.putString(message); //Print the String
+        // UPDATE ME SeeedOled.putString(argv, argc); //Print the String
       }
       break;
   }
@@ -801,17 +796,12 @@ void setup()
 #endif
    delay(500);
 
-#if 0
+#if 1
         SeeedOled.clearDisplay();          //clear the screen and set start position to top left corner
         SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
         
 static const char message[] PROGMEM = "abcdefghifghijklmnopqrstuvwxyz01234567890";
         SeeedOled.setTicker(message);
-
-        for (;;) {
-          SeeedOled.updateTicker();
-          //delay(500);
-        }
 #endif
 
   // Connecting from LinkIt
@@ -822,6 +812,7 @@ static const char message[] PROGMEM = "abcdefghifghijklmnopqrstuvwxyz01234567890
   Firmata.begin(57600);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for ATmega32u4-based boards and Arduino 101
+      SeeedOled.updateTicker();
   }
 
   systemResetCallback();  // reset to default config
@@ -868,4 +859,6 @@ void loop()
 #ifdef FIRMATA_SERIAL_FEATURE
   serialFeature.update();
 #endif
+
+  SeeedOled.updateTicker();
 }

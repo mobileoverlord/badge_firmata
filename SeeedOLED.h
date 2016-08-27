@@ -37,10 +37,6 @@
 #define SeeedOLED_Max_X                 127 //128 Pixels
 #define SeeedOLED_Max_Y                 63  //64  Pixels
 
-#define PAGE_MODE                       01
-#define HORIZONTAL_MODE                 02
-
-
 #define SeeedOLED_Address               0x3c
 #define SeeedOLED_Command_Mode          0x80
 #define SeeedOLED_Data_Mode             0x40
@@ -63,7 +59,6 @@ void setInverseDisplay();
 
 void sendCommand(unsigned char command);
 void sendData(unsigned char Data);
-void sendData(unsigned char *Data, int count);
 
 void setTextXY(unsigned char Row, unsigned char Column);
 void clearDisplay();
