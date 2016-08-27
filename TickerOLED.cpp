@@ -401,8 +401,8 @@ void TickerOLED::drawBitmap(const unsigned char *bitmaparray, int bytes)
   } while (bytes > 0);
 }
 
-#define TICKER_MAX_LENGTH  20 // Tweet length
-#define TICKER_CHAR_WIDTH  16 // Max
+#define TICKER_MAX_LENGTH  40 // Kind of the max length
+#define TICKER_CHAR_WIDTH  8 // Rough average width
 #define TICKER_CHAR_HEIGHT 24
 #define TICKER_PAGES     (TICKER_CHAR_HEIGHT / 8)
 #define TICKER_COLUMNS   (TICKER_CHAR_WIDTH * TICKER_MAX_LENGTH)
