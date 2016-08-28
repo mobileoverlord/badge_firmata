@@ -72,7 +72,9 @@ byte TickerOLED::setTextXY(unsigned char Row, unsigned char Column)
     Wire.beginTransmission(TickerOLED_Address); // begin I2C communication
     Wire.write(TickerOLED_Command_Mode);        // Set OLED Command mode
     Wire.write(0xB0 + Row);            //set page address
+    Wire.write(TickerOLED_Command_Mode);        // Set OLED Command mode
     Wire.write(0x00 + (8*Column & 0x0F));  //set column lower address
+    Wire.write(TickerOLED_Command_Mode);        // Set OLED Command mode
     Wire.write(0x10 + ((8*Column>>4)&0x0F));   //set column higher address
     return Wire.endTransmission();                // End I2C communication
 }
@@ -89,8 +91,8 @@ byte TickerOLED::clearDisplay()
       int chunkSize = min(bytes, MAX_DATA_CHUNK);
       for (int j = 0; j < chunkSize; j++)
           Wire.write(0);
-      Wire.endTransmission();                    // stop I2C transmission
       bytes -= chunkSize;
+      Wire.endTransmission(bytes != 0); // stop I2C transmission if last one
   } while (bytes > 0);
   return setTextXY(0,0); // Should be unnecessary
 }
@@ -107,8 +109,8 @@ void TickerOLED::drawBitmap(const unsigned char *bitmaparray, int bytes)
           Wire.write(pgm_read_byte(bitmaparray));
           bitmaparray++;
       }
-      Wire.endTransmission();                    // stop I2C transmission
       bytes -= chunkSize;
+      Wire.endTransmission(bytes != 0); // stop I2C transmission if last one
   } while (bytes > 0);
 }
 
@@ -200,8 +202,8 @@ void TickerOLED::updateTicker()
                 offset = offsetStart;
             }
         }
-        Wire.endTransmission();                    // stop I2C transmission
         bytes -= chunkSize;
+        Wire.endTransmission(bytes != 0); // stop I2C transmission if last one
     } while (bytes > 0);
     tickerColumn++;
     if (tickerColumn >= tickerMaxColumn)
