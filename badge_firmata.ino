@@ -785,18 +785,20 @@ void setup()
   // Firmata.begin(Serial1);
 
   Wire.begin();
-  TickerOLED::init();  //initialze SEEED OLED display
+  if (TickerOLED::init() == 0) {
 #if 0
-  TickerOLED::setTextXY(0, 0);
-  TickerOLED::drawBitmap(NervesLogo, sizeof(NervesLogo));   // 1024 = 128 Pixels * 64 Pixels / 8
+      TickerOLED::setTextXY(0, 0);
+      TickerOLED::drawBitmap(NervesLogo, sizeof(NervesLogo));   // 1024 = 128 Pixels * 64 Pixels / 8
 #endif
 #if 1
-  TickerOLED::setTextXY(3, 0);
-  TickerOLED::drawBitmap(NervesSmall, sizeof(NervesSmall));
+      TickerOLED::setTextXY(3, 0);
+      TickerOLED::drawBitmap(NervesSmall, sizeof(NervesSmall));
 
 static const char message[] = "Loading...";
-  TickerOLED::setTicker(message, sizeof(message));
+      TickerOLED::setTicker(message, sizeof(message));
+      TickerOLED::updateTicker();
 #endif
+  }
 
   // Connecting from LinkIt
   // Serial1.begin(57600);

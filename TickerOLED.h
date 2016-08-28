@@ -27,14 +27,7 @@
 #ifndef TickerOLED_data_H
 #define TickerOLED_data_H
 
-// TickerOLED Instruction set addresses
-
-#if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
-#else
-#include <WProgram.h>
-#include "Wire.h"
-#endif
 
 #define TickerOLED_Max_X                 127 //128 Pixels
 #define TickerOLED_Max_Y                 63  //64  Pixels
@@ -54,14 +47,12 @@ class TickerOLED {
 
 public:
 
-static void init();
+static byte init();
+static byte sendCommand(unsigned char command);
 
-static void sendCommand(unsigned char command);
-static void sendData(unsigned char Data);
-
-static void setTextXY(unsigned char Row, unsigned char Column);
-static void clearDisplay();
-static void setBrightness(unsigned char Brightness);
+static byte setTextXY(unsigned char Row, unsigned char Column);
+static byte clearDisplay();
+static byte setBrightness(unsigned char Brightness);
 static void drawBitmap(const unsigned char *bitmaparray,int bytes);
 
 static void setTicker(const char *message, uint16_t len);
