@@ -820,10 +820,10 @@ static const char message[] = "Loading...";
 
   // Connecting from Host
   // Firmata.begin(57600);
-  while (!Serial1) {
-    ; // wait for serial port to connect. Needed for ATmega32u4-based boards and Arduino 101
-
-  }
+//  while (!Serial1) {
+//    ; // wait for serial port to connect. Needed for ATmega32u4-based boards and Arduino 101
+//
+//  }
   TickerOLED::updateTicker();
   systemResetCallback();  // reset to default config
 }
