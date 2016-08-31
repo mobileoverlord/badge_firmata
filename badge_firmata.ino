@@ -86,11 +86,13 @@ signed char queryIndex = -1;
 // default delay time between i2c read request and Wire.requestFrom()
 unsigned int i2cReadDelayTime = 0;
 
+#ifdef USE_SERVOS
 Servo servos[MAX_SERVOS];
 byte servoPinMap[TOTAL_PINS];
 byte detachedServos[MAX_SERVOS];
 byte detachedServoCount = 0;
 byte servoCount = 0;
+#endif
 
 boolean isResetting = false;
 
@@ -116,7 +118,7 @@ byte wireRead(void)
 /*==============================================================================
  * FUNCTIONS
  *============================================================================*/
-
+#ifdef USE_SERVOS
 void attachServo(byte pin, int minPulse, int maxPulse)
 {
   if (servoCount < MAX_SERVOS) {
@@ -139,7 +141,7 @@ void attachServo(byte pin, int minPulse, int maxPulse)
 }
 
 void detachServo(byte pin)
-{
+{  
   servos[servoPinMap[pin]].detach();
   // if we're detaching the last servo, decrement the count
   // otherwise store the index of the detached servo
@@ -154,6 +156,7 @@ void detachServo(byte pin)
 
   servoPinMap[pin] = 255;
 }
+#endif
 
 void readAndReportData(byte address, int theRegister, byte numBytes, byte stopTX) {
   // allow I2C requests that don't require a register read
@@ -176,9 +179,9 @@ void readAndReportData(byte address, int theRegister, byte numBytes, byte stopTX
 
   // check to be sure correct number of bytes were returned by slave
   if (numBytes < Wire.available()) {
-    Firmata.sendString("I2C: Too many bytes received");
+    Firmata.sendString("I2C: Too many bytes");
   } else if (numBytes > Wire.available()) {
-    Firmata.sendString("I2C: Too few bytes received");
+    Firmata.sendString("I2C: Too few bytes");
   }
 
   i2cRxData[0] = address;
@@ -243,11 +246,13 @@ void setPinModeCallback(byte pin, int mode)
     // the following if statements should reconfigure the pins properly
     disableI2CPins();
   }
+#ifdef USE_SERVOS
   if (IS_PIN_DIGITAL(pin) && mode != PIN_MODE_SERVO) {
     if (servoPinMap[pin] < MAX_SERVOS && servos[servoPinMap[pin]].attached()) {
       detachServo(pin);
     }
   }
+#endif
   if (IS_PIN_ANALOG(pin)) {
     reportAnalogCallback(PIN_TO_ANALOG(pin), mode == PIN_MODE_ANALOG ? 1 : 0); // turn on/off reporting
   }
@@ -303,6 +308,7 @@ void setPinModeCallback(byte pin, int mode)
         Firmata.setPinMode(pin, PIN_MODE_PWM);
       }
       break;
+#ifdef USE_SERVOS      
     case PIN_MODE_SERVO:
       if (IS_PIN_DIGITAL(pin)) {
         Firmata.setPinMode(pin, PIN_MODE_SERVO);
@@ -313,6 +319,7 @@ void setPinModeCallback(byte pin, int mode)
         }
       }
       break;
+#endif
     case PIN_MODE_I2C:
       if (IS_PIN_I2C(pin)) {
         // mark the pin as i2c
@@ -326,7 +333,7 @@ void setPinModeCallback(byte pin, int mode)
 #endif
       break;
     default:
-      Firmata.sendString("Unknown pin mode"); // TODO: put error msgs in EEPROM
+      Firmata.sendString("Bad mode"); // TODO: put error msgs in EEPROM
   }
   // TODO: save status to EEPROM here, if changed
 }
@@ -351,11 +358,13 @@ void analogWriteCallback(byte pin, int value)
 {
   if (pin < TOTAL_PINS) {
     switch (Firmata.getPinMode(pin)) {
+#ifdef USE_SERVOS
       case PIN_MODE_SERVO:
         if (IS_PIN_DIGITAL(pin))
           servos[servoPinMap[pin]].write(value);
         Firmata.setPinState(pin, value);
         break;
+#endif
       case PIN_MODE_PWM:
         if (IS_PIN_PWM(pin))
           analogWrite(PIN_TO_PWM(pin), value);
@@ -459,7 +468,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
     case I2C_REQUEST:
       mode = argv[1] & I2C_READ_WRITE_MODE_MASK;
       if (argv[1] & I2C_10BIT_ADDRESS_MODE_MASK) {
-        Firmata.sendString("10-bit addressing not supported");
+        Firmata.sendString("10-bit!");
         return;
       }
       else {
@@ -501,7 +510,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
         case I2C_READ_CONTINUOUSLY:
           if ((queryIndex + 1) >= I2C_MAX_QUERIES) {
             // too many queries, just ignore
-            Firmata.sendString("too many queries");
+            Firmata.sendString("too many");
             break;
           }
           if (argc == 6) {
@@ -565,6 +574,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
       }
 
       break;
+#ifdef USE_SERVOS
     case SERVO_CONFIG:
       if (argc > 4) {
         // these vars are here for clarity, they'll optimized away by the compiler
@@ -581,6 +591,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
         }
       }
       break;
+#endif
     case SAMPLING_INTERVAL:
       if (argc > 1) {
         samplingInterval = argv[0] + (argv[1] << 7);
@@ -746,13 +757,17 @@ void systemResetCallback()
       setPinModeCallback(i, OUTPUT);
     }
 
+#ifdef USE_SERVOS
     servoPinMap[i] = 255;
+#endif
   }
   // by default, do not report any analog inputs
   analogInputsToReport = 0;
 
+#ifdef USE_SERVOS
   detachedServoCount = 0;
   servoCount = 0;
+#endif
 
   /* send digital inputs to set the initial state on the host computer,
    * since once in the loop(), this firmware will only send on change */
@@ -786,6 +801,7 @@ void setup()
 
   Wire.begin();
   TickerOLED::init();  //initialze SEEED OLED display
+  TickerOLED::clearDisplay();
 #if 0
   TickerOLED::setTextXY(0, 0);
   TickerOLED::drawBitmap(NervesLogo, sizeof(NervesLogo));   // 1024 = 128 Pixels * 64 Pixels / 8

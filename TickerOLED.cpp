@@ -26,9 +26,18 @@
 #include "TickerOLED.h"
 
 #include <avr/pgmspace.h>
-#include "arial.h"
+#include "arial-2pages.h"
 
 #define MAX_DATA_CHUNK 31  // The Arduino has a 32 byte limit and the OLED wants a "Data" indicator byte
+
+#define TICKER_PAGES       2
+#define TICKER_CHAR_HEIGHT (TICKER_PAGES * 8)
+#define TICKER_COLUMNS     620 // 3 page height -> 420
+#define TICKER_RESTART_GAP 16  // columns
+
+static uint8_t tickerBuffer[TICKER_PAGES][TICKER_COLUMNS];
+static uint16_t tickerColumn = 0;
+static uint16_t tickerMaxColumn = 0;
 
 byte TickerOLED::init()
 {
@@ -113,17 +122,6 @@ void TickerOLED::drawBitmap(const unsigned char *bitmaparray, int bytes)
       Wire.endTransmission(bytes != 0); // stop I2C transmission if last one
   } while (bytes > 0);
 }
-
-#define TICKER_MAX_LENGTH  40 // Kind of the max length
-#define TICKER_CHAR_WIDTH  8 // Rough average width
-#define TICKER_CHAR_HEIGHT 24
-#define TICKER_PAGES     (TICKER_CHAR_HEIGHT / 8)
-#define TICKER_COLUMNS   (TICKER_CHAR_WIDTH * TICKER_MAX_LENGTH)
-#define TICKER_RESTART_GAP 16  // columns
-
-static uint8_t tickerBuffer[TICKER_PAGES][TICKER_COLUMNS];
-static uint16_t tickerColumn = 0;
-static uint16_t tickerMaxColumn = 0;
 
 void TickerOLED::setTicker(const char *message, uint16_t len)
 {
