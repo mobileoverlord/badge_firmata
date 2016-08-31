@@ -689,6 +689,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
       break;
     case NERVES_OLED_WRITE:
       {
+        TickerOLED::clearDisplay();
         TickerOLED::setTextXY(3, 0);
         TickerOLED::drawBitmap(NervesSmall, sizeof(NervesSmall));
         TickerOLED::setTicker((const char *) argv, argc); //Print the String
