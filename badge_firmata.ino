@@ -785,32 +785,30 @@ void setup()
   // Firmata.begin(Serial1);
 
   Wire.begin();
-  if (TickerOLED::init() == 0) {
+  TickerOLED::init();  //initialze SEEED OLED display
 #if 0
-      TickerOLED::setTextXY(0, 0);
-      TickerOLED::drawBitmap(NervesLogo, sizeof(NervesLogo));   // 1024 = 128 Pixels * 64 Pixels / 8
+  TickerOLED::setTextXY(0, 0);
+  TickerOLED::drawBitmap(NervesLogo, sizeof(NervesLogo));   // 1024 = 128 Pixels * 64 Pixels / 8
 #endif
 #if 1
-      TickerOLED::setTextXY(3, 0);
-      TickerOLED::drawBitmap(NervesSmall, sizeof(NervesSmall));
+  TickerOLED::setTextXY(3, 0);
+  TickerOLED::drawBitmap(NervesSmall, sizeof(NervesSmall));
 
 static const char message[] = "Loading...";
-      TickerOLED::setTicker(message, sizeof(message));
-      TickerOLED::updateTicker();
+  TickerOLED::setTicker(message, sizeof(message));
 #endif
-  }
 
   // Connecting from LinkIt
-  // Serial1.begin(57600);
-  // Firmata.begin(Serial1);
+  Serial1.begin(57600);
+  Firmata.begin(Serial1);
 
   // Connecting from Host
-  Firmata.begin(57600);
-  while (!Serial) {
+  // Firmata.begin(57600);
+  while (!Serial1) {
     ; // wait for serial port to connect. Needed for ATmega32u4-based boards and Arduino 101
-      TickerOLED::updateTicker();
-  }
 
+  }
+  TickerOLED::updateTicker();
   systemResetCallback();  // reset to default config
 }
 
